@@ -1,5 +1,5 @@
-from django.conf.urls import patterns, include, url
-from api.views.events import EventView, EventsView
+from django.conf.urls import patterns, url
+from api.views import EventsView, EventView
 
 urlpatterns = patterns('',
 	url(r'^api/v1/events/(?P<id>\d+)', EventView.as_view()),

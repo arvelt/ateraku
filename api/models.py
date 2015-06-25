@@ -54,3 +54,11 @@ class Event(ndb.Model):
 			'absence': str(self.absence),
 		}
 		return dict
+
+class User(ndb.Model):
+	name = ndb.StringProperty()
+	email = ndb.StringProperty()
+	twitter_id = ndb.StringProperty()
+	google_id = ndb.StringProperty()
+	future_events = ndb.KeyProperty()
+	past_events = ndb.KeyProperty()
