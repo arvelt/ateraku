@@ -21,11 +21,11 @@ def render_json_response(request, data, status=None):
 		response = HttpResponse(json_str, content_type='application/json; charset=UTF-8', status=status)
 	return response
 
-class EventsView(View):
+class EventView(View):
 
 	@method_decorator(csrf_exempt)
 	def dispatch(self, *args, **kwargs):
-		return super(EventsView, self).dispatch(*args, **kwargs)
+		return super(EventView, self).dispatch(*args, **kwargs)
 
 	def get(self, request, *args, **kwargs):
 		csrf_token = get_token(request)
@@ -37,13 +37,6 @@ class EventsView(View):
 			data = {'event': event.to_dict(), 'csrf_token': csrf_token}
 		return render_json_response(request, data)
 
-	def post(self, request, *args, **kwargs):
-		id = kwargs.get('id')
-		event = Event.create(**kwargs)
-		print event
-		data = {'event': event}
-		return render_json_response(request, data)
-
 	def put(self, request, *args, **kwargs):
 		id = kwargs.get('id')
 		data = {}
@@ -53,5 +46,26 @@ class EventsView(View):
 		id = kwargs.get('id')
 		event = Event.get_by_pk(id)
 		event.delete()
-		data = {event: {}}
+		data = {'event': {}}
+		return render_json_response(request, data)
+
+class EventsView(View):
+
+	@method_decorator(csrf_exempt)
+	def dispatch(self, *args, **kwargs):
+		return super(EventsView, self).dispatch(*args, **kwargs)
+
+	def get(self, request, *args, **kwargs):
+		csrf_token = get_token(request)
+
+		dict_events = []
+		events = Event.query()
+		for event in events:
+			dict_events.append(event.to_dict())
+		data = {'events': dict_events, 'csrf_token': csrf_token}
+		return render_json_response(request, data)
+
+	def post(self, request, *args, **kwargs):
+		event = Event.create(**kwargs)
+		data = {'event': event.to_dict()}
 		return render_json_response(request, data)

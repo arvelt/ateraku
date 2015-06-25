@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+import pprint
 
 class Event(ndb.Model):
 	name = ndb.StringProperty()
@@ -35,8 +36,14 @@ class Event(ndb.Model):
 		event.put()
 		return event
 
+	def delete(self):
+		id = self.key.id()
+		self.key.delete()
+		return id
+
 	def to_dict(self):
-		return {
+		dict = {
+			'id': str(self.key.id()),
 			'name': self.name,
 			'description': self.description,
 			'place': self.place,
@@ -45,3 +52,4 @@ class Event(ndb.Model):
 			'interest': str(self.interest),
 			'absence': str(self.absence),
 		}
+		return dict
