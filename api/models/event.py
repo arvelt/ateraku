@@ -3,6 +3,7 @@ import pprint
 
 class Event(ndb.Model):
 	name = ndb.StringProperty()
+	organizer = ndb.KeyProperty()
 	description = ndb.TextProperty()
 	place = ndb.StringProperty()
 	date = ndb.DateTimeProperty()
