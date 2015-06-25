@@ -33,33 +33,3 @@ def events_list(request):
 
 	data = {'events': events}
 	return render_json_response(request, data)
-
-# FIXME
-#@ensure_csrf_cookie
-def events(request, id):
-	request.csrf_exempt = True
-	if request.method == 'GET':
-		return get_event(request, id)
-	elif request.method == 'POST':
-		return post_event(request, id)
-	elif request.method == 'PUT':
-		return put_event(request, id)
-	elif request.method == 'DELETE':
-		return delete_event(request, id)
-
-def get_event(request, id):
-	csrf_token = get_token(request)
-	data = {'events-get': id, 'csrf_token': csrf_token}
-	return render_json_response(request, data)
-
-def post_event(request, id):
-	data = {'events-post': id}
-	return render_json_response(request, data)
-
-def put_event(request, id):
-	data = {}
-	return render_json_response(request, data)
-
-def delete_event(request, id):
-	data = {}
-	return render_json_response(request, data)
