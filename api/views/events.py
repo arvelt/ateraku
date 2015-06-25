@@ -6,6 +6,8 @@ from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
+from api.models.event import Event
+
 def render_json_response(request, data, status=None):
 	'''response を JSON で返却'''
 	json_str = json.dumps(data, ensure_ascii=False, indent=2)
@@ -28,12 +30,18 @@ class EventsView(View):
 	def get(self, request, *args, **kwargs):
 		csrf_token = get_token(request)
 		id = kwargs.get('id')
-		data = {'events-get': id, 'csrf_token': csrf_token}
+		event = Event.get_by_pk(id)
+		if event is None:
+			data = {'event': {}, 'csrf_token': csrf_token}
+		else:
+			data = {'event': event.to_dict(), 'csrf_token': csrf_token}
 		return render_json_response(request, data)
 
 	def post(self, request, *args, **kwargs):
 		id = kwargs.get('id')
-		data = {'events-post': id}
+		event = Event.create(**kwargs)
+		print event
+		data = {'event': event}
 		return render_json_response(request, data)
 
 	def put(self, request, *args, **kwargs):
@@ -43,5 +51,7 @@ class EventsView(View):
 
 	def delete(self, request, *args, **kwargs):
 		id = kwargs.get('id')
-		data = {}
+		event = Event.get_by_pk(id)
+		event.delete()
+		data = {event: {}}
 		return render_json_response(request, data)
