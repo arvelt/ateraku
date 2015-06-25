@@ -7,6 +7,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 from api.models import Event
+from api.forms import EventForm
+
+from pprint import pprint
 
 def render_json_response(request, data, status=None):
 	'''response を JSON で返却'''
@@ -65,7 +68,12 @@ class EventsView(View):
 		data = {'events': dict_events, 'csrf_token': csrf_token}
 		return render_json_response(request, data)
 
-	def post(self, request, *args, **kwargs):
-		event = Event.create(**kwargs)
-		data = {'event': event.to_dict()}
+	def post(self, request):
+		form = EventForm(request.POST)
+		if form.is_valid():
+			pprint(form.cleaned_data)
+			event = Event.create(**form.cleaned_data)
+			data = {'event': event.to_dict()}
+		else:
+			data = {'error':form.errors}
 		return render_json_response(request, data)

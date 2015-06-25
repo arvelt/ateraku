@@ -3,13 +3,13 @@ import pprint
 
 class Event(ndb.Model):
 	name = ndb.StringProperty()
-	organizer = ndb.KeyProperty()
+	organizer = ndb.StringProperty()
 	description = ndb.TextProperty()
 	place = ndb.StringProperty()
 	date = ndb.DateTimeProperty()
-	attend = ndb.KeyProperty()
-	interest = ndb.KeyProperty()
-	absence = ndb.KeyProperty()
+	attend = ndb.StringProperty()
+	interest = ndb.StringProperty()
+	absence = ndb.StringProperty()
 
 	@classmethod
 	def get_by_pk(cls, id, **ctx_options):
@@ -18,6 +18,7 @@ class Event(ndb.Model):
 	@classmethod
 	def create(cls, **kwargs):
 		name = kwargs.get('name', '')
+		organizer = kwargs.get('organizer', '')
 		description = kwargs.get('description', '')
 		place = kwargs.get('place', '')
 		date = kwargs.get('date', None)
@@ -27,6 +28,7 @@ class Event(ndb.Model):
 
 		event = Event(
 			name = name,
+			organizer = organizer,
 			description = description,
 			place = place,
 			date = date,
@@ -46,6 +48,7 @@ class Event(ndb.Model):
 		dict = {
 			'id': str(self.key.id()),
 			'name': self.name,
+			'organizer': self.organizer,
 			'description': self.description,
 			'place': self.place,
 			'date': str(self.date),
