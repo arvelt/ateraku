@@ -1,7 +1,7 @@
 # coding: utf-8
 import json
 from django.middleware.csrf import get_token
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -42,7 +42,12 @@ class EventView(View):
 
 	def put(self, request, *args, **kwargs):
 		id = kwargs.get('id')
-		data = {}
+		form = EventForm(QueryDict(request.body))
+		if form.is_valid():
+			event = Event.update(id, form.cleaned_data)
+			data = {'event': event.to_dict()}
+		else:
+			data = {'error': form.errors}
 		return render_json_response(request, data)
 
 	def delete(self, request, *args, **kwargs):
@@ -71,7 +76,6 @@ class EventsView(View):
 	def post(self, request):
 		form = EventForm(request.POST)
 		if form.is_valid():
-			pprint(form.cleaned_data)
 			event = Event.create(**form.cleaned_data)
 			data = {'event': event.to_dict()}
 		else:

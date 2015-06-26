@@ -1,7 +1,6 @@
 from django import forms
 
 class EventForm(forms.Form):
-	id = forms.CharField(required=False)
 	name = forms.CharField()
 	organizer = forms.CharField()
 	description = forms.CharField(required=False)

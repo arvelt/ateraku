@@ -39,6 +39,23 @@ class Event(ndb.Model):
 		event.put()
 		return event
 
+	@classmethod
+	def update(cls, id, kwargs):
+		event = cls.get_by_pk(id)
+		if event:
+			event.populate(
+				name= kwargs['name'],
+				organizer= kwargs['organizer'],
+				description= kwargs['description'],
+				place= kwargs['place'],
+				date= kwargs['date'],
+				attend= kwargs['attend'],
+				interest= kwargs['interest'],
+				absence= kwargs['absence']
+			)
+		event.put()
+		return event
+
 	def delete(self):
 		id = self.key.id()
 		self.key.delete()
