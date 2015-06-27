@@ -1,9 +1,9 @@
 from google.appengine.ext import ndb
-import pprint
+from pprint import pprint
 
 class Event(ndb.Model):
-	name = ndb.StringProperty()
-	organizer = ndb.StringProperty()
+	name = ndb.StringProperty(required=True)
+	organizer = ndb.KeyProperty(required=True, kind='User')
 	description = ndb.TextProperty()
 	place = ndb.StringProperty()
 	date = ndb.DateTimeProperty()
@@ -26,9 +26,13 @@ class Event(ndb.Model):
 		interest = kwargs.get('interest', None)
 		absence = kwargs.get('absence', None)
 
+		user = User.get_by_pk(organizer)
+
+		pprint(user)
+
 		event = Event(
 			name = name,
-			organizer = organizer,
+			organizer = user.key,
 			description = description,
 			place = place,
 			date = date,
@@ -65,7 +69,7 @@ class Event(ndb.Model):
 		dict = {
 			'id': str(self.key.id()),
 			'name': self.name,
-			'organizer': self.organizer,
+			'organizer': self.organizer.id(),
 			'description': self.description,
 			'place': self.place,
 			'date': str(self.date),
@@ -82,3 +86,58 @@ class User(ndb.Model):
 	google_id = ndb.StringProperty()
 	future_events = ndb.KeyProperty()
 	past_events = ndb.KeyProperty()
+
+	@classmethod
+	def get_by_pk(cls, id, **ctx_options):
+		return ndb.Key(cls, int(id)).get(**ctx_options)
+
+	@classmethod
+	def create(cls, **kwargs):
+		name = kwargs.get('name', '')
+		email = kwargs.get('organizer', '')
+		twitter_id = kwargs.get('description', '')
+		google_id = kwargs.get('place', '')
+		future_events = kwargs.get('date', None)
+		past_events = kwargs.get('attend', None)
+
+		user = User(
+			name = name,
+			email = email,
+			twitter_id = twitter_id,
+			google_id = google_id,
+			future_events = future_events,
+			past_events = past_events,
+		)
+		user.put()
+		return user
+
+	@classmethod
+	def update(cls, id, kwargs):
+		user = cls.get_by_pk(id)
+		if user:
+			user.populate(
+				name= kwargs['name'],
+				email= kwargs['email'],
+				twitter_id= kwargs['twitter_id'],
+				google_id= kwargs['google_id'],
+				future_events= kwargs['future_events'],
+				past_events= kwargs['past_events'],
+			)
+		user.put()
+		return user
+
+	def delete(self):
+		id = self.key.id()
+		self.key.delete()
+		return id
+
+	def to_dict(self):
+		return {
+			'id': str(self.key.id()),
+			'name': self.name,
+			'email': self.email,
+			'twitter_id': self.twitter_id,
+			'google_id': self.google_id,
+			'future_users': str(self.future_events),
+			'past_events': str(self.past_events),
+		}

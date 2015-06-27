@@ -6,8 +6,8 @@ from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from api.models import Event
-from api.forms import EventForm
+from api.models import Event, User
+from api.forms import EventForm, UserForm
 
 from pprint import pprint
 
@@ -23,6 +23,7 @@ def render_json_response(request, data, status=None):
 	else:
 		response = HttpResponse(json_str, content_type='application/json; charset=UTF-8', status=status)
 	return response
+
 
 class EventView(View):
 
@@ -57,6 +58,7 @@ class EventView(View):
 		data = {'event': {}}
 		return render_json_response(request, data)
 
+
 class EventsView(View):
 
 	@method_decorator(csrf_exempt)
@@ -78,6 +80,56 @@ class EventsView(View):
 		if form.is_valid():
 			event = Event.create(**form.cleaned_data)
 			data = {'event': event.to_dict()}
+		else:
+			data = {'error':form.errors}
+		return render_json_response(request, data)
+
+
+class UserView(View):
+
+	@method_decorator(csrf_exempt)
+	def dispatch(self, *args, **kwargs):
+		return super(UserView, self).dispatch(*args, **kwargs)
+
+	def get(self, request, *args, **kwargs):
+		csrf_token = get_token(request)
+		id = kwargs.get('id')
+		user = User.get_by_pk(id)
+		if user is None:
+			data = {'user': {}, 'csrf_token': csrf_token}
+		else:
+			data = {'user': user.to_dict(), 'csrf_token': csrf_token}
+		return render_json_response(request, data)
+
+	def put(self, request, *args, **kwargs):
+		id = kwargs.get('id')
+		form = UserForm(QueryDict(request.body))
+		if form.is_valid():
+			user = User.update(id, form.cleaned_data)
+			data = {'event': user.to_dict()}
+		else:
+			data = {'error': form.errors}
+		return render_json_response(request, data)
+
+	def delete(self, request, *args, **kwargs):
+		id = kwargs.get('id')
+		user = User.get_by_pk(id)
+		user.delete()
+		data = {'event': {}}
+		return render_json_response(request, data)
+
+
+class UsersView(View):
+
+	@method_decorator(csrf_exempt)
+	def dispatch(self, *args, **kwargs):
+		return super(UsersView, self).dispatch(*args, **kwargs)
+
+	def post(self, request):
+		form = UserForm(request.POST)
+		if form.is_valid():
+			user = User.create(**form.cleaned_data)
+			data = {'user': user.to_dict()}
 		else:
 			data = {'error':form.errors}
 		return render_json_response(request, data)

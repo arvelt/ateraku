@@ -9,3 +9,11 @@ class EventForm(forms.Form):
 	attend = forms.CharField(required=False)
 	interest = forms.CharField(required=False)
 	absence = forms.CharField(required=False)
+
+class UserForm(forms.Form):
+	name = forms.CharField()
+	email = forms.CharField()
+	twitter_id = forms.CharField(required=False)
+	google_id = forms.CharField(required=False)
+	future_events = forms.CharField(required=False)
+	past_events = forms.CharField(required=False)
