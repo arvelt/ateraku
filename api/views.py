@@ -43,7 +43,8 @@ class EventView(View):
 
 	def put(self, request, *args, **kwargs):
 		id = kwargs.get('id')
-		form = EventForm(QueryDict(request.body))
+		data = json.loads(request.body)
+		form = EventForm(data)
 		if form.is_valid():
 			event = Event.update(id, form.cleaned_data)
 			data = {'event': event.to_dict()}
@@ -76,7 +77,8 @@ class EventsView(View):
 		return render_json_response(request, data)
 
 	def post(self, request):
-		form = EventForm(request.POST)
+		data = json.loads(request.body)
+		form = EventForm(data)
 		if form.is_valid():
 			event = Event.create(**form.cleaned_data)
 			data = {'event': event.to_dict()}
@@ -103,7 +105,8 @@ class UserView(View):
 
 	def put(self, request, *args, **kwargs):
 		id = kwargs.get('id')
-		form = UserForm(QueryDict(request.body))
+		data = json.loads(request.body)
+		form = UserForm(data)
 		if form.is_valid():
 			user = User.update(id, form.cleaned_data)
 			data = {'event': user.to_dict()}
@@ -126,7 +129,8 @@ class UsersView(View):
 		return super(UsersView, self).dispatch(*args, **kwargs)
 
 	def post(self, request):
-		form = UserForm(request.POST)
+		data = json.loads(request.body)
+		form = UserForm(data)
 		if form.is_valid():
 			user = User.create(**form.cleaned_data)
 			data = {'user': user.to_dict()}
